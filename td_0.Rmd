@@ -1,0 +1,11 @@
+
+## TD0
+```{R}
+# paste permet de concaténer des chaînes de caractères
+for (x in 1:10) {
+  print(paste("Le nombre est : ",x+2))
+}
+```
+
+# dplyr sert à faire de la manipulation de données
+# ggplot2 sert à faire des graphiques

@@ -1,0 +1,100 @@
+---
+title: "td_0"
+format: html
+editor: visual
+---
+
+# **Exercice 2 :**
+
+## 1) What is metabolic hepatic steatosis ?
+
+It's an abnormal retention of fat within a cell or organ.
+
+## 2) a) How many mice are used ?
+
+97 mices where used for this experience.
+
+## 2) b) What treatments do they receive ?
+
+They were actually receiving treatments based on a heavy control diet.
+
+## 2) c) How many groups are there ?
+
+There are actually four groups.
+
+## 5)
+
+```{r data loading}
+library(readr)
+meta_data <- read_delim("Steatosis_phenotype.csv",
+delim = ";", escape_double = FALSE, trim_ws = TRUE)
+#View(meta_data)
+#str(meta_data)
+```
+
+## 6 et 7)
+
+```{r na values}
+lines_with_na = which(is.na(apply(meta_data[,-c(2,4)],1,sum)))
+lines_with_na
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+```{r}
+## Nombre de lignes ## (Number of samples)
+paste("Le nombre de lignes est :",nrow(meta_data))
+
+## Suppression des lignes non nulles
+#meta_data <- meta_data[lines_with_na,]
+
+
+## Nombre de groupes ## (Number of groups)
+paste("Le nombre de groupes uniques est :",length(unique(meta_data[["Group"]])))
+
+## Nombre de samples par groupe ## (Number of samples per group)
+
+group_counts <- table(meta_data[,2])
+#col_names = names(group_counts)
+paste("Le nombre de sample par groupe est : ")
+print(group_counts)
+
+```
+
+Yes it correspond to the informations available in the paper.
+
+## 8) 
+
+```{r boxplots1}
+library(dplyr)
+meta_data %>%
+group_by(Group) %>%
+summarise(mean = mean(Cholesterol,na.rm = TRUE),
+std = sd(Cholesterol,na.rm = TRUE),
+n = n())
+
+```
+
+```{r boxplots2}
+library(ggplot2)
+ggplot(meta_data,aes(x=Group,y=Cholesterol,fill=Group)) + geom_boxplot() + theme_minimal() + labs(title="Boxplot de la répartition du cholesterol en fonction des groupes")
+```
+
+On constate que les groupes d'individus avec les répartitions de cholesterol les plus hautes sont "HF" et "HF-IRON" qui correspondent aux souris avec un régime riche en graisses et en graisses et glucides. Contrairement à aux deux autres groupes "CON" et "IRON".
+
+```{r final}
+library(tidyr)
+meta_data.explore <- meta_data[,-c(1,4)]
+resume_stats <- meta_data.explore %>%
+pivot_longer(cols = -Group,
+           names_to = "Variable",
+              values_to = "Valeur") %>%
+  group_by(Group,Variable) %>% summarise(
+Mean = mean(Valeur, na.rm = TRUE),
+SD = sd(Valeur, na.rm = TRUE),
+.groups = "drop"
+)
+
+resume_stats
+
+```
